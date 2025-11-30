@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự Đoán Tuyển Sinh</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .card-main { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .header { background: #0d6efd; color: white; padding: 20px; border-radius: 15px 15px 0 0; text-align: center; }
+        .hidden { display: none; }
+        .btn-predict { background-color: #fd7e14; color: white; font-weight: bold; border: none; }
+        .btn-predict:hover { background-color: #e36a09; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-main">
+                <div class="header">
+                    <h3 class="mb-0">HỆ THỐNG DỰ ĐOÁN ĐIỂM THI</h3>
+                    <small>Nhập điểm để phân tích khả năng trúng tuyển</small>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/predict" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Họ và Tên</label>
+                                <input type="text" name="name" class="form-control" required placeholder="Nhập tên...">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Khu vực ưu tiên</label>
+                                <select name="region" class="form-select">
+                                    <option value="KV3">KV3 (0 điểm)</option>
+                                    <option value="KV2">KV2 (+0.25)</option>
+                                    <option value="KV2-NT">KV2-NT (+0.5)</option>
+                                    <option value="KV1">KV1 (+0.75)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-primary">Chọn Khối Thi:</label>
+                            <select name="block_name" id="blockSelect" class="form-select form-select-lg" onchange="updateForm()">
+                                <option value="A00">Khối A00 (Toán, Lý, Hóa)</option>
+                                <option value="A01">Khối A01 (Toán, Lý, Anh)</option>
+                                <option value="B00">Khối B00 (Toán, Hóa, Sinh)</option>
+                                <option value="C00">Khối C00 (Văn, Sử, Địa)</option>
+                                <option value="D01">Khối D01 (Toán, Văn, Anh)</option>
+                            </select>
+                        </div>
+
+                        <h5 class="border-bottom pb-2 mb-3">Nhập điểm thành phần</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4"><label>Toán</label><input type="number" step="0.01" min="0" max="10" name="math" class="form-control" required></div>
+                            <div class="col-md-4"><label>Ngữ Văn</label><input type="number" step="0.01" min="0" max="10" name="literature" class="form-control" required></div>
+                            <div class="col-md-4"><label>Tiếng Anh</label><input type="number" step="0.01" min="0" max="10" name="english" class="form-control" required></div>
+                            
+                            <div class="col-md-4 sub-input" id="box_physics"><label>Vật Lý</label><input type="number" step="0.01" min="0" max="10" name="physics" id="physics" class="form-control"></div>
+                            <div class="col-md-4 sub-input" id="box_chemistry"><label>Hóa Học</label><input type="number" step="0.01" min="0" max="10" name="chemistry" id="chemistry" class="form-control"></div>
+                            <div class="col-md-4 sub-input" id="box_biology"><label>Sinh Học</label><input type="number" step="0.01" min="0" max="10" name="biology" id="biology" class="form-control"></div>
+                            <div class="col-md-4 sub-input" id="box_history"><label>Lịch Sử</label><input type="number" step="0.01" min="0" max="10" name="history" id="history" class="form-control"></div>
+                            <div class="col-md-4 sub-input" id="box_geography"><label>Địa Lý</label><input type="number" step="0.01" min="0" max="10" name="geography" id="geography" class="form-control"></div>
+                            <div class="col-md-4 sub-input" id="box_gdcd"><label>GDCD</label><input type="number" step="0.01" min="0" max="10" name="gdcd" id="gdcd" class="form-control"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-predict w-100 py-3 mt-4 text-uppercase">
+                            <i class="fas fa-search me-2"></i> Xem Dự Đoán Kết Quả
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateForm() {
+        const block = document.getElementById("blockSelect").value;
+        const subjects = ["physics", "chemistry", "biology", "history", "geography", "gdcd"];
+        
+        // 1. Reset: Ẩn hết và BỎ required
+        subjects.forEach(sub => {
+            document.getElementById("box_" + sub).classList.add("hidden");
+            const input = document.getElementById(sub);
+            input.value = "";
+            input.required = false; // Quan trọng: Bỏ bắt buộc
+        });
+
+        // 2. Hàm hiển thị
+        const show = (ids) => {
+            ids.forEach(id => {
+                document.getElementById("box_" + id).classList.remove("hidden");
+                document.getElementById(id).required = true; // Quan trọng: Thêm bắt buộc
+            });
+        }
+
+        // 3. Logic hiển thị
+        if (block === "A00") show(["physics", "chemistry"]);
+        else if (block === "A01") show(["physics"]);
+        else if (block === "B00") show(["chemistry", "biology"]);
+        else if (block === "C00") show(["history", "geography"]);
+        // D01 mặc định chỉ Toán Văn Anh
+    }
+    
+    // Chạy ngay khi tải trang
+    window.onload = updateForm;
+</script>
+
+</body>
+</html>
