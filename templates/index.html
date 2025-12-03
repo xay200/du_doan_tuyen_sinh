@@ -3,113 +3,438 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dự Đoán Tuyển Sinh</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>AI Dự Đoán Tuyển Sinh | Báo Cáo Học Máy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
-        .card-main { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .header { background: #0d6efd; color: white; padding: 20px; border-radius: 15px 15px 0 0; text-align: center; }
-        .hidden { display: none; }
-        .btn-predict { background-color: #fd7e14; color: white; font-weight: bold; border: none; }
-        .btn-predict:hover { background-color: #e36a09; }
+        /* --- CSS NÂNG CẤP GIAO DIỆN --- */
+
+        /* 1. Phần hiển thị biểu đồ (Charts) */
+        .charts-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .algo-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .algo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .algo-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 2. Phần Quy trình xử lý (Timeline Dọc đẹp hơn) */
+        .timeline-section {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 0; /* Loại bỏ margin bottom để line nối liền mạch */
+            position: relative;
+            padding-bottom: 35px; /* Tạo khoảng cách bằng padding */
+        }
+
+        /* Đường kẻ nối dọc */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 24px; /* Căn giữa icon (50px / 2 - 1px) */
+            top: 50px;
+            bottom: 0;
+            width: 2px;
+            background: #cbd5e1;
+            z-index: 0;
+        }
+        
+        /* Ẩn đường kẻ ở item cuối cùng */
+        .timeline-item:last-child::before,
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-icon-box {
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .timeline-icon {
+            width: 50px; height: 50px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+            box-shadow: 0 0 0 4px #f8fafc; /* Viền trắng bao quanh để tách đường kẻ */
+            transition: all 0.3s;
+        }
+
+        .timeline-item:hover .timeline-icon {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 6px #e0e7ff;
+        }
+
+        .timeline-content {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            flex-grow: 1;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        /* Mũi tên trỏ vào content */
+        .timeline-content::after {
+            content: '';
+            position: absolute;
+            top: 20px; left: -6px;
+            width: 12px; height: 12px;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            transform: rotate(45deg);
+        }
+
+        .timeline-item:hover .timeline-content {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+
+        .timeline-step-num {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .timeline-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card card-main">
-                <div class="header">
-                    <h3 class="mb-0">HỆ THỐNG DỰ ĐOÁN ĐIỂM THI</h3>
-                    <small>Nhập điểm để phân tích khả năng trúng tuyển</small>
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; font-weight: 600; color: var(--primary); font-size: 1.1rem;">Hệ thống đang xử lý dữ liệu...</p>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-area">
+                <h1><i class="fa-solid fa-graduation-cap"></i> AI Dự Đoán Tuyển Sinh</h1>
+            </div>
+            <p>Hệ thống hỗ trợ ra quyết định dựa trên Học máy & Thống kê</p>
+        </header>
+
+        <div class="card">
+            <form method="POST" id="predictForm" onsubmit="return validateAndSubmit()">
+                
+                <h3><i class="fa-solid fa-address-card"></i> Thông tin hồ sơ</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Họ và Tên thí sinh</label>
+                        <input type="text" name="name" value="{{ input_data.name if input_data else '' }}" required placeholder="Ví dụ: Nguyễn Văn A">
+                    </div>
+                    <div class="form-group">
+                        <label>Khu vực ưu tiên</label>
+                        <select name="region">
+                            <option value="KV3" {% if input_data and input_data.region == 'KV3' %}selected{% endif %}>KV3 (Không cộng điểm)</option>
+                            <option value="KV2" {% if input_data and input_data.region == 'KV2' %}selected{% endif %}>KV2 (+0.25 điểm)</option>
+                            <option value="KV2-NT" {% if input_data and input_data.region == 'KV2-NT' %}selected{% endif %}>KV2-NT (+0.5 điểm)</option>
+                            <option value="KV1" {% if input_data and input_data.region == 'KV1' %}selected{% endif %}>KV1 (+0.75 điểm)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <form action="/predict" method="post">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Họ và Tên</label>
-                                <input type="text" name="name" class="form-control" required placeholder="Nhập tên...">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Khu vực ưu tiên</label>
-                                <select name="region" class="form-select">
-                                    <option value="KV3">KV3 (0 điểm)</option>
-                                    <option value="KV2">KV2 (+0.25)</option>
-                                    <option value="KV2-NT">KV2-NT (+0.5)</option>
-                                    <option value="KV1">KV1 (+0.75)</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-primary">Chọn Khối Thi:</label>
-                            <select name="block_name" id="blockSelect" class="form-select form-select-lg" onchange="updateForm()">
-                                <option value="A00">Khối A00 (Toán, Lý, Hóa)</option>
-                                <option value="A01">Khối A01 (Toán, Lý, Anh)</option>
-                                <option value="B00">Khối B00 (Toán, Hóa, Sinh)</option>
-                                <option value="C00">Khối C00 (Văn, Sử, Địa)</option>
-                                <option value="D01">Khối D01 (Toán, Văn, Anh)</option>
-                            </select>
-                        </div>
+                <h3><i class="fa-solid fa-cubes"></i> Khối xét tuyển</h3>
+                <div class="form-group">
+                    <select name="block_name" id="blockSelect" onchange="updateSubjects()" style="font-weight: 600; color: var(--primary);">
+                        <option value="A00" {% if input_data and input_data.block_name == 'A00' %}selected{% endif %}>Khối A00 (Toán, Lý, Hóa)</option>
+                        <option value="A01" {% if input_data and input_data.block_name == 'A01' %}selected{% endif %}>Khối A01 (Toán, Lý, Anh)</option>
+                        <option value="B00" {% if input_data and input_data.block_name == 'B00' %}selected{% endif %}>Khối B00 (Toán, Hóa, Sinh)</option>
+                        <option value="C00" {% if input_data and input_data.block_name == 'C00' %}selected{% endif %}>Khối C00 (Văn, Sử, Địa)</option>
+                        <option value="D01" {% if input_data and input_data.block_name == 'D01' %}selected{% endif %}>Khối D01 (Toán, Văn, Anh)</option>
+                    </select>
+                </div>
 
-                        <h5 class="border-bottom pb-2 mb-3">Nhập điểm thành phần</h5>
-                        <div class="row g-3">
-                            <div class="col-md-4"><label>Toán</label><input type="number" step="0.01" min="0" max="10" name="math" class="form-control" required></div>
-                            <div class="col-md-4"><label>Ngữ Văn</label><input type="number" step="0.01" min="0" max="10" name="literature" class="form-control" required></div>
-                            <div class="col-md-4"><label>Tiếng Anh</label><input type="number" step="0.01" min="0" max="10" name="english" class="form-control" required></div>
-                            
-                            <div class="col-md-4 sub-input" id="box_physics"><label>Vật Lý</label><input type="number" step="0.01" min="0" max="10" name="physics" id="physics" class="form-control"></div>
-                            <div class="col-md-4 sub-input" id="box_chemistry"><label>Hóa Học</label><input type="number" step="0.01" min="0" max="10" name="chemistry" id="chemistry" class="form-control"></div>
-                            <div class="col-md-4 sub-input" id="box_biology"><label>Sinh Học</label><input type="number" step="0.01" min="0" max="10" name="biology" id="biology" class="form-control"></div>
-                            <div class="col-md-4 sub-input" id="box_history"><label>Lịch Sử</label><input type="number" step="0.01" min="0" max="10" name="history" id="history" class="form-control"></div>
-                            <div class="col-md-4 sub-input" id="box_geography"><label>Địa Lý</label><input type="number" step="0.01" min="0" max="10" name="geography" id="geography" class="form-control"></div>
-                            <div class="col-md-4 sub-input" id="box_gdcd"><label>GDCD</label><input type="number" step="0.01" min="0" max="10" name="gdcd" id="gdcd" class="form-control"></div>
-                        </div>
+                <h3><i class="fa-solid fa-pen-to-square"></i> Nhập điểm thi (Thang điểm 10)</h3>
+                <div class="score-grid">
+                    <div class="score-item" id="wrap_math"><label>Toán</label><input type="number" step="0.01" min="0" max="10" name="math" id="math" value="{{ input_data.math if input_data else '' }}" placeholder="0-10" required></div>
+                    <div class="score-item" id="wrap_literature"><label>Ngữ Văn</label><input type="number" step="0.01" min="0" max="10" name="literature" id="literature" value="{{ input_data.literature if input_data else '' }}" placeholder="0-10" required></div>
+                    <div class="score-item" id="wrap_english"><label>Tiếng Anh</label><input type="number" step="0.01" min="0" max="10" name="english" id="english" value="{{ input_data.english if input_data else '' }}" placeholder="0-10" required></div>
+                    
+                    <div class="score-item hidden" id="wrap_physics"><label>Vật Lý</label><input type="number" step="0.01" min="0" max="10" name="physics" id="physics" value="{{ input_data.physics if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_chemistry"><label>Hóa Học</label><input type="number" step="0.01" min="0" max="10" name="chemistry" id="chemistry" value="{{ input_data.chemistry if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_biology"><label>Sinh Học</label><input type="number" step="0.01" min="0" max="10" name="biology" id="biology" value="{{ input_data.biology if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_history"><label>Lịch Sử</label><input type="number" step="0.01" min="0" max="10" name="history" id="history" value="{{ input_data.history if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_geography"><label>Địa Lý</label><input type="number" step="0.01" min="0" max="10" name="geography" id="geography" value="{{ input_data.geography if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_gdcd"><label>GDCD</label><input type="number" step="0.01" min="0" max="10" name="gdcd" id="gdcd" value="{{ input_data.gdcd if input_data else '' }}" placeholder="0-10"></div>
+                </div>
 
-                        <button type="submit" class="btn btn-predict w-100 py-3 mt-4 text-uppercase">
-                            <i class="fas fa-search me-2"></i> Xem Dự Đoán Kết Quả
-                        </button>
-                    </form>
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <a href="/" class="btn-reset" type="button" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 30%; background: #f1f5f9; color: var(--text-sub); border-radius: 12px; font-weight: 600;">
+                        <i class="fa-solid fa-rotate-right" style="margin-right: 8px;"></i> Làm mới
+                    </a>
+                    <button type="submit" class="btn-submit" style="width: 70%;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> PHÂN TÍCH KẾT QUẢ
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if trace %}
+        <div class="result-box" id="resultSection">
+            
+            <div class="result-header">
+                <p style="text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 10px;">Đánh giá tổng quát</p>
+                <div class="final-verdict {{ trace.result_css }}">
+                    {% if trace.result_css == 'success' %}<i class="fa-solid fa-check-circle"></i>
+                    {% elif trace.result_css == 'warning' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                    {% else %}<i class="fa-solid fa-circle-xmark"></i>{% endif %}
+                    {{ trace.message }}
                 </div>
             </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e0e7ff; color: var(--primary);"><i class="fa-solid fa-star"></i></div>
+                    <div class="stat-value">{{ trace.final_total }}</div>
+                    <div class="stat-label">Tổng điểm xét tuyển</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #dcfce7; color: #166534;"><i class="fa-solid fa-ranking-star"></i></div>
+                    
+                    <div class="stat-value">Top {{ "%.2f"|format(100 - trace.percentile) }}%</div>
+                    
+                    <div class="stat-label">Xếp hạng toàn quốc</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: {{ '#fee2e2' if trace.is_liet else '#d1fae5' }}; color: {{ '#991b1b' if trace.is_liet else '#065f46' }};">
+                        <i class="fa-solid {{ 'fa-ban' if trace.is_liet else 'fa-check' }}"></i>
+                    </div>
+                    <div class="stat-value" style="font-size: 1.4rem; color: {{ '#ef4444' if trace.is_liet else '#10b981' }}">
+                        {{ "Vi phạm" if trace.is_liet else "Đạt chuẩn" }}
+                    </div>
+                    <div class="stat-label">Điều kiện điểm liệt</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px dashed var(--border);">
+                <h4 style="color: var(--text-main); margin-bottom: 25px; font-weight: 800; text-align: center; font-size: 1.2rem;">
+                    <i class="fa-solid fa-chart-pie" style="color: #ec4899; margin-right: 8px;"></i> PHÂN TÍCH & TRỰC QUAN HÓA
+                </h4>
+
+                <div class="charts-wrapper">
+                    
+                    {% if trace.algo_plots.comparison_bar %}
+                    <div class="algo-card">
+                        <div class="algo-title"><i class="fa-solid fa-chart-column"></i> So sánh các Mô hình</div>
+                        <img src="data:image/png;base64,{{ trace.algo_plots.comparison_bar }}" style="width: 100%; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+
+                    {% if trace.algo_plots.consensus_pie %}
+                    <div class="algo-card">
+                        <div class="algo-title"><i class="fa-solid fa-chart-pie"></i> Tổng quan Hệ thống</div>
+                        <div style="display:flex; justify-content:center; align-items:center; height: 100%;">
+                            <img src="data:image/png;base64,{{ trace.algo_plots.consensus_pie }}" style="max-height: 250px; border-radius: 8px;">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if trace.plot_url %}
+                    <div class="algo-card">
+                        <div class="algo-title"><i class="fa-solid fa-map-location-dot"></i> Vị trí trên Phổ điểm</div>
+                        <img src="data:image/png;base64,{{ trace.plot_url }}" style="width: 100%; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+
+                    {% if trace.algo_plots.rf_importance %}
+                    <div class="algo-card">
+                        <div class="algo-title"><i class="fa-solid fa-sliders"></i> Yếu tố quan trọng (Random Forest)</div>
+                        <img src="data:image/png;base64,{{ trace.algo_plots.rf_importance }}" style="width: 100%; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+                    
+                    {% if trace.algo_plots.lr_coefs %}
+                    <div class="algo-card">
+                        <div class="algo-title"><i class="fa-solid fa-arrow-trend-up"></i> Trọng số Hồi quy (Logistic)</div>
+                        <img src="data:image/png;base64,{{ trace.algo_plots.lr_coefs }}" style="width: 100%; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h4 style="color: var(--text-main); margin-bottom: 15px; font-weight: 700;">
+                    <i class="fa-solid fa-robot" style="color: var(--secondary);"></i> Bảng điểm Dự đoán chi tiết
+                </h4>
+                <div class="model-list">
+                    {% for model, (label, prob) in trace.model_results.items() %}
+                    <div class="model-item" style="border-top: 4px solid {{ '#10b981' if prob >= 50 else '#ef4444' }}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <span class="model-name" style="font-weight: 600;">{{ model }}</span>
+                        <span class="model-prob" style="color: {{ '#10b981' if prob >= 50 else '#ef4444' }}; font-size: 1.3rem;">
+                            {{ "%.2f"|format(prob) }}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">
+                            {{ label }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 40px 30px;">
+                <h4 style="color: var(--text-main); margin-bottom: 40px; font-weight: 800; text-align: center; font-size: 1.3rem;">
+                    <i class="fa-solid fa-gears" style="color: #f59e0b; margin-right: 10px;"></i> QUY TRÌNH XỬ LÝ DỮ LIỆU (PIPELINE)
+                </h4>
+                
+                <div class="timeline-section">
+                    <div class="timeline-item">
+                        <div class="timeline-icon-box">
+                            <div class="timeline-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+                        </div>
+                        <div class="timeline-content">
+                            <span class="timeline-step-num">Bước 1</span>
+                            <div class="timeline-title">Thu thập & Tiền xử lý</div>
+                            <div class="timeline-desc">
+                                Hệ thống tiếp nhận điểm số từ Form nhập liệu. Tự động kiểm tra giá trị hợp lệ (0-10) và điền 0 cho các môn vắng thi (Missing Imputation).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon-box">
+                            <div class="timeline-icon"><i class="fa-solid fa-calculator"></i></div>
+                        </div>
+                        <div class="timeline-content">
+                            <span class="timeline-step-num">Bước 2</span>
+                            <div class="timeline-title">Feature Engineering (Tạo đặc trưng)</div>
+                            <div class="timeline-desc">
+                                Tính tổng điểm theo khối thi đã chọn ({{ input_data.block_name }}). Cộng điểm ưu tiên khu vực ({{ input_data.region }}). Kiểm tra điều kiện điểm liệt (< 1.0).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon-box">
+                            <div class="timeline-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                        </div>
+                        <div class="timeline-content">
+                            <span class="timeline-step-num">Bước 3</span>
+                            <div class="timeline-title">Chuẩn hóa dữ liệu (Scaling)</div>
+                            <div class="timeline-desc">
+                                Dữ liệu đầu vào được đưa về cùng thang đo bằng <code>StandardScaler</code> (Mean=0, Std=1) để đảm bảo độ chính xác cho SVM và KNN.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon-box">
+                            <div class="timeline-icon"><i class="fa-solid fa-network-wired"></i></div>
+                        </div>
+                        <div class="timeline-content">
+                            <span class="timeline-step-num">Bước 4</span>
+                            <div class="timeline-title">Ensemble Learning (Học máy tổ hợp)</div>
+                            <div class="timeline-desc">
+                                4 Mô hình (Logistic, Random Forest, SVM, KNN) chạy song song. Sử dụng kỹ thuật <code>Probability Calibration</code> để chuyển đổi đầu ra thành xác suất chuẩn xác.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon-box">
+                            <div class="timeline-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
+                        </div>
+                        <div class="timeline-content">
+                            <span class="timeline-step-num">Bước 5</span>
+                            <div class="timeline-title">Phân tích Thống kê & Ra quyết định</div>
+                            <div class="timeline-desc">
+                                So sánh điểm với phổ điểm toàn quốc 2019 (Percentile Ranking). Kết hợp kết quả AI với Luật chuyên gia (Expert Rules) để đưa ra kết luận cuối cùng.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+        {% endif %}
     </div>
-</div>
 
-<script>
-    function updateForm() {
-        const block = document.getElementById("blockSelect").value;
-        const subjects = ["physics", "chemistry", "biology", "history", "geography", "gdcd"];
-        
-        // 1. Reset: Ẩn hết và BỎ required
-        subjects.forEach(sub => {
-            document.getElementById("box_" + sub).classList.add("hidden");
-            const input = document.getElementById(sub);
-            input.value = "";
-            input.required = false; // Quan trọng: Bỏ bắt buộc
-        });
-
-        // 2. Hàm hiển thị
-        const show = (ids) => {
-            ids.forEach(id => {
-                document.getElementById("box_" + id).classList.remove("hidden");
-                document.getElementById(id).required = true; // Quan trọng: Thêm bắt buộc
-            });
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function validateAndSubmit() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            for (let input of inputs) {
+                if (input.value && (input.value < 0 || input.value > 10)) {
+                    alert("Điểm thi phải nằm trong khoảng từ 0 đến 10!");
+                    input.focus();
+                    return false;
+                }
+            }
+            showLoader();
+            return true;
         }
 
-        // 3. Logic hiển thị
-        if (block === "A00") show(["physics", "chemistry"]);
-        else if (block === "A01") show(["physics"]);
-        else if (block === "B00") show(["chemistry", "biology"]);
-        else if (block === "C00") show(["history", "geography"]);
-        // D01 mặc định chỉ Toán Văn Anh
-    }
-    
-    // Chạy ngay khi tải trang
-    window.onload = updateForm;
-</script>
-
+        {% if trace %}
+            window.onload = function() {
+                const resultDiv = document.getElementById("resultSection");
+                if(resultDiv) {
+                    const y = resultDiv.getBoundingClientRect().top + window.scrollY - 20;
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }
+            };
+        {% endif %}
+        
+        document.addEventListener("DOMContentLoaded", function() { updateSubjects(); });
+    </script>
 </body>
 </html>
