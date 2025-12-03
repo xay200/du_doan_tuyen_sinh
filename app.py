@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy import stats
+from sklearn.tree import plot_tree 
 
 app = Flask(__name__)
 
@@ -98,26 +99,78 @@ def generate_model_insights(model_results_dict):
         plots['consensus_pie'] = base64.b64encode(img.getvalue()).decode()
         plt.close(fig)
 
-    # 3. BIỂU ĐỒ FEATURE IMPORTANCE (Random Forest) - Giữ nguyên
+   # 3. RANDOM FOREST (FEATURE IMPORTANCE + DECISION TREE)
     if "Random Forest" in resources["models"]:
-        model = resources["models"]["Random Forest"]
-        if hasattr(model, 'estimator'):
-            base_model = model.estimator
-            if hasattr(base_model, 'feature_importances_'):
-                importances = base_model.feature_importances_
-                indices = np.argsort(importances)
-                fig, ax = plt.subplots(figsize=(8, 4))
-                fig.patch.set_alpha(0.0); ax.patch.set_alpha(0.0)
-                ax.barh(range(len(indices)), importances[indices], color='#8b5cf6', alpha=0.8)
-                ax.set_yticks(range(len(indices)))
-                ax.set_yticklabels([COLS_ORDER[i] for i in indices])
-                ax.set_title("Tầm quan trọng đặc trưng (Random Forest)", color='#1e293b', fontweight='bold')
-                ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
-                img = io.BytesIO()
-                fig.savefig(img, format='png', bbox_inches='tight')
-                img.seek(0)
-                plots['rf_importance'] = base64.b64encode(img.getvalue()).decode()
-                plt.close(fig)
+        raw_model = resources["models"]["Random Forest"]
+        base_rf = None
+
+        # --- LOGIC MỚI: TỰ ĐỘNG TÌM LÕI RANDOM FOREST ---
+        # Thử các trường hợp để lấy ra model gốc
+        try:
+            if hasattr(raw_model, "estimators_"): 
+                base_rf = raw_model  # Trường hợp model gốc
+            elif hasattr(raw_model, "calibrated_classifiers_"): 
+                # Trường hợp CalibratedClassifierCV (CV mặc định)
+                base_rf = raw_model.calibrated_classifiers_[0].estimator
+            elif hasattr(raw_model, "estimator"): 
+                # Trường hợp CalibratedClassifierCV (prefit) hoặc Wrapper khác
+                base_rf = raw_model.estimator
+        except Exception as e:
+            print(f"Lỗi tìm lõi model: {e}")
+
+        # Chỉ vẽ nếu tìm thấy lõi Random Forest hợp lệ
+        if base_rf is not None:
+            
+            # 3.1 Feature Importance
+            if hasattr(base_rf, 'feature_importances_'):
+                try:
+                    importances = base_rf.feature_importances_
+                    indices = np.argsort(importances)
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    fig.patch.set_alpha(0.0); ax.patch.set_alpha(0.0)
+                    ax.barh(range(len(indices)), importances[indices], color='#8b5cf6', alpha=0.8)
+                    ax.set_yticks(range(len(indices)))
+                    ax.set_yticklabels([COLS_ORDER[i] for i in indices])
+                    ax.set_title("Tầm quan trọng đặc trưng", color='#1e293b', fontweight='bold')
+                    ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+                    img = io.BytesIO()
+                    fig.savefig(img, format='png', bbox_inches='tight')
+                    img.seek(0)
+                    plots['rf_importance'] = base64.b64encode(img.getvalue()).decode()
+                    plt.close(fig)
+                except: pass
+
+            # 3.2 VẼ CÂY QUYẾT ĐỊNH (Decision Tree Viz)
+            # Kiểm tra kỹ xem có danh sách cây con (estimators_) không
+            if hasattr(base_rf, 'estimators_') and len(base_rf.estimators_) > 0:
+                try:
+                    # Lấy cây đầu tiên
+                    single_tree = base_rf.estimators_[0]
+                    
+                    fig, ax = plt.subplots(figsize=(20, 10)) # Tăng kích thước ảnh lên
+                    fig.patch.set_alpha(0.0)
+                    
+                    # Vẽ cây
+                    plot_tree(single_tree, 
+                              feature_names=COLS_ORDER,
+                              class_names=["Trượt", "Đỗ"], 
+                              filled=True, 
+                              rounded=True,
+                              max_depth=3, # Giới hạn 3 tầng để dễ nhìn
+                              fontsize=11,
+                              ax=ax)
+                    
+                    ax.set_title("Minh họa Logic: Nếu... Thì...", color='#1e293b', fontweight='bold', fontsize=16)
+                    
+                    img = io.BytesIO()
+                    fig.savefig(img, format='png', bbox_inches='tight')
+                    img.seek(0)
+                    plots['dt_viz'] = base64.b64encode(img.getvalue()).decode()
+                    plt.close(fig)
+                except Exception as e:
+                    print(f"Không thể vẽ cây: {e}")
+            else:
+                print("Không tìm thấy estimators_ trong model đã giải nén.")
 
     # 4. BIỂU ĐỒ COEFFICIENTS (Logistic Regression) - Giữ nguyên
     if "Logistic Regression" in resources["models"]:

@@ -297,12 +297,22 @@
                     </div>
                     {% endif %}
 
-                    {% if trace.algo_plots.rf_importance %}
+                    <!-- Thêm mới -->
+                    {% if trace.algo_plots.dt_viz %}
+                    <div class="algo-card" style="grid-column: 1 / -1;">
+                        <div class="algo-title"><i class="fa-solid fa-tree"></i> Cây Quyết Định Minh Họa</div>
+                        <div style="overflow-x: auto; width: 100%;">
+                            <img src="data:image/png;base64,{{ trace.algo_plots.dt_viz }}" style="max-height: 400px; display: block; margin: 0 auto; border-radius: 8px;">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- {% if trace.algo_plots.rf_importance %}
                     <div class="algo-card">
                         <div class="algo-title"><i class="fa-solid fa-sliders"></i> Yếu tố quan trọng (Random Forest)</div>
                         <img src="data:image/png;base64,{{ trace.algo_plots.rf_importance }}" style="width: 100%; border-radius: 8px;">
                     </div>
-                    {% endif %}
+                    {% endif %} -->
                     
                     {% if trace.algo_plots.lr_coefs %}
                     <div class="algo-card">
