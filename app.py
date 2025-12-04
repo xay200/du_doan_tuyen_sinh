@@ -197,6 +197,134 @@ def generate_model_insights(model_results_dict):
     return plots
 
 @app.route("/", methods=["GET", "POST"])
+#     if not resources["models"]: return "<h3>Vui lòng chạy: python -m training.run_all</h3>"
+#     input_data = None; trace = None
+    
+#     if request.method == "POST":
+#         form = request.form
+#         scores = {
+#             "math": get_safe_float(form.get("math")), "literature": get_safe_float(form.get("literature")),
+#             "english": get_safe_float(form.get("english")), "physics": get_safe_float(form.get("physics")),
+#             "chemistry": get_safe_float(form.get("chemistry")), "biology": get_safe_float(form.get("biology")),
+#             "history": get_safe_float(form.get("history")), "geography": get_safe_float(form.get("geography")),
+#             "gdcd": get_safe_float(form.get("gdcd")),
+#         }
+#         input_data = { "name": form.get("name"), "region": form.get("region"), "block_name": form.get("block_name"), **scores }
+
+#         # --- LOGIC TÍNH TOÁN ---
+#         bname = form.get("block_name")
+#         if bname == "A00": raw_total = scores["math"] + scores["physics"] + scores["chemistry"]
+#         elif bname == "A01": raw_total = scores["math"] + scores["physics"] + scores["english"]
+#         elif bname == "B00": raw_total = scores["math"] + scores["chemistry"] + scores["biology"]
+#         elif bname == "C00": raw_total = scores["literature"] + scores["history"] + scores["geography"]
+#         else: raw_total = scores["math"] + scores["literature"] + scores["english"]
+        
+#         priority = PRIORITY_SCORES.get(form.get("region"), 0)
+#         final_total = raw_total + priority
+        
+#         # Check liệt
+#         block_subjects = []
+#         if bname == "A00": block_subjects = [scores["math"], scores["physics"], scores["chemistry"]]
+#         elif bname == "A01": block_subjects = [scores["math"], scores["physics"], scores["english"]]
+#         elif bname == "B00": block_subjects = [scores["math"], scores["chemistry"], scores["biology"]]
+#         elif bname == "C00": block_subjects = [scores["literature"], scores["history"], scores["geography"]]
+#         else: block_subjects = [scores["math"], scores["literature"], scores["english"]]
+#         is_liet = any(s <= 1.0 for s in block_subjects)
+
+#         # Percentile
+#         percentile = 0
+#         current_dist = []
+#         if resources["block_dists"] and bname in resources["block_dists"]:
+#             current_dist = resources["block_dists"][bname]
+#             percentile = stats.percentileofscore(current_dist, raw_total)
+
+#         # Chuẩn bị dữ liệu cho Model
+#         feature_dict = {
+#             "Toan Hoc": scores["math"], "Ngu Van": scores["literature"], "Ngoai Ngu": scores["english"],
+#             "Vat Ly": scores["physics"], "Hoa Hoc": scores["chemistry"], "Sinh Hoc": scores["biology"],
+#             "Lich Su": scores["history"], "Dia Ly": scores["geography"], "GDCD": scores["gdcd"]
+#         }
+#         input_df = pd.DataFrame([feature_dict])[COLS_ORDER]
+#         input_scaled = resources["scaler"].transform(input_df)
+
+#         # --- [QUAN TRỌNG] TẠO DỮ LIỆU CHO BẢNG PIPELINE (Bước 2) ---
+#         pipeline_specs = []
+#         if resources["scaler"]:
+#             scaler = resources["scaler"]
+#             # Lấy mean và scale từ scaler đã học
+#             means = scaler.mean_
+#             scales = scaler.scale_
+#             raw_vals = input_df.iloc[0].tolist()
+#             scaled_vals = input_scaled[0].tolist()
+
+#             for i, col in enumerate(COLS_ORDER):
+#                 # Chỉ hiện các môn có điểm hoặc môn chính để bảng đỡ rối
+#                 if raw_vals[i] > 0 or col in ["Toan Hoc", "Ngu Van", "Ngoai Ngu"]:
+#                     pipeline_specs.append({
+#                         "feature": col,
+#                         "raw": raw_vals[i],
+#                         "mean": round(means[i], 4),
+#                         "std": round(scales[i], 4),
+#                         "result": round(scaled_vals[i], 4)
+#                     })
+#         # -----------------------------------------------------------
+
+#         model_results = {}
+#         probs = []
+        
+#         if is_liet:
+#             final_message = "TRƯỢT (Điểm liệt)"; result_css = "danger"
+#             for m in resources["models"]: model_results[m] = ("Trượt", 0.0)
+#         else:
+#             for m_name, model in resources["models"].items():
+#                 try:
+#                     raw_prob = model.predict_proba(input_scaled)[0][1] * 100
+#                     final_prob = raw_prob
+#                     # Logic Boosting
+#                     if final_total >= 27: final_prob = max(raw_prob, 98.0 + np.random.uniform(0, 1.9))
+#                     elif final_total >= 24: final_prob = max(raw_prob, 90.0 + np.random.uniform(0, 5))
+#                     elif final_total >= 21: final_prob = max(raw_prob, 75.0 + np.random.uniform(0, 10))
+#                     elif final_total >= 18: final_prob = max(raw_prob, 55.0)
+#                     if percentile > 90: final_prob = max(final_prob, 92.0)
+                    
+#                     label = "Đỗ" if final_prob >= 50 else "Trượt"
+#                     model_results[m_name] = (label, final_prob)
+#                     probs.append(final_prob)
+#                 except: pass
+
+#             avg_prob = np.mean(probs) if probs else 0
+#             if avg_prob >= 85: final_message = f"CHẮC CHẮN ĐỖ ({avg_prob:.1f}%)"; result_css = "success"
+#             elif avg_prob >= 60: final_message = f"KHẢ QUAN ({avg_prob:.1f}%)"; result_css = "success"
+#             elif avg_prob >= 40: final_message = f"CÂN NHẮC ({avg_prob:.1f}%)"; result_css = "warning"
+#             else: final_message = f"NGUY HIỂM ({avg_prob:.1f}%)"; result_css = "danger"
+
+#         # Vẽ biểu đồ Phổ điểm
+#         plot_url = None
+#         if not is_liet and len(current_dist) > 0:
+#             fig, ax = plt.subplots(figsize=(8, 4))
+#             fig.patch.set_alpha(0.0); ax.patch.set_alpha(0.0)
+#             ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+#             ax.hist(current_dist, bins=40, density=True, color='#6366f1', alpha=0.25, label=f'Phổ điểm {bname}')
+#             ax.axvline(np.mean(current_dist), color='gray', linestyle=':', label=f'TB: {np.mean(current_dist):.1f}')
+#             ax.axvline(raw_total, color='#ef4444', linewidth=2.5, linestyle='-', label='Bạn')
+#             ax.set_title(f"Vị trí trên phổ điểm {bname}", color='#1e293b', fontweight='bold')
+#             ax.legend(); ax.set_yticks([])
+#             img = io.BytesIO(); fig.savefig(img, format='png', bbox_inches='tight'); img.seek(0)
+#             plot_url = base64.b64encode(img.getvalue()).decode(); plt.close(fig)
+
+#         algo_plots = generate_model_insights(model_results)
+
+#         trace = {
+#             "raw_total": round(raw_total, 2), "priority": priority, "final_total": round(final_total, 2),
+#             "percentile": round(percentile, 1), "is_liet": is_liet, "message": final_message,
+#             "result_css": result_css, "plot_url": plot_url, "model_results": model_results,
+#             "algo_plots": algo_plots,
+#             # [QUAN TRỌNG] Gửi dữ liệu này sang HTML
+#             "pipeline_specs": pipeline_specs, 
+#             "block_name": bname 
+#         }
+
+#     return render_template("index.html", input_data=input_data, trace=trace)
 def index():
     if not resources["models"]: return "<h3>Vui lòng chạy: python -m training.run_all</h3>"
     input_data = None; trace = None
@@ -212,7 +340,7 @@ def index():
         }
         input_data = { "name": form.get("name"), "region": form.get("region"), "block_name": form.get("block_name"), **scores }
 
-        # --- LOGIC TÍNH ĐIỂM (Giữ nguyên) ---
+        # --- BƯỚC 1: LOGIC TÍNH TỔNG ĐIỂM & ĐIỂM LIỆT ---
         bname = form.get("block_name")
         if bname == "A00": raw_total = scores["math"] + scores["physics"] + scores["chemistry"]
         elif bname == "A01": raw_total = scores["math"] + scores["physics"] + scores["english"]
@@ -223,7 +351,7 @@ def index():
         priority = PRIORITY_SCORES.get(form.get("region"), 0)
         final_total = raw_total + priority
         
-        # Check liệt
+        # Check liệt (<= 1.0)
         block_subjects = []
         if bname == "A00": block_subjects = [scores["math"], scores["physics"], scores["chemistry"]]
         elif bname == "A01": block_subjects = [scores["math"], scores["physics"], scores["english"]]
@@ -239,15 +367,41 @@ def index():
             current_dist = resources["block_dists"][bname]
             percentile = stats.percentileofscore(current_dist, raw_total)
 
-        # AI Prediction
+        # --- BƯỚC 2: CHUẨN BỊ DỮ LIỆU CHO AI (FEATURE ENGINEERING) ---
         feature_dict = {
             "Toan Hoc": scores["math"], "Ngu Van": scores["literature"], "Ngoai Ngu": scores["english"],
             "Vat Ly": scores["physics"], "Hoa Hoc": scores["chemistry"], "Sinh Hoc": scores["biology"],
             "Lich Su": scores["history"], "Dia Ly": scores["geography"], "GDCD": scores["gdcd"]
         }
         input_df = pd.DataFrame([feature_dict])[COLS_ORDER]
+        
+        # Scaling dữ liệu
         input_scaled = resources["scaler"].transform(input_df)
 
+        # --- [QUAN TRỌNG] TẠO DỮ LIỆU CHI TIẾT CHO BẢNG PIPELINE ---
+        pipeline_specs = []
+        if resources["scaler"]:
+            scaler = resources["scaler"]
+            # Lấy thông số từ Scaler đã được huấn luyện
+            # Lưu ý: StandardScaler công thức là z = (x - mean) / std
+            means = scaler.mean_
+            scales = scaler.scale_ # Đây là độ lệch chuẩn (std)
+            raw_vals = input_df.iloc[0].tolist()
+            scaled_vals = input_scaled[0].tolist()
+
+            for i, col in enumerate(COLS_ORDER):
+                # Chỉ hiển thị các môn có điểm (>0) hoặc môn chính để bảng đỡ rối
+                # Logic: Hiển thị nếu điểm > 0 HOẶC là môn chính (Toán/Văn/Anh)
+                if raw_vals[i] > 0 or col in ["Toan Hoc", "Ngu Van", "Ngoai Ngu"]:
+                    pipeline_specs.append({
+                        "feature": col,
+                        "raw": raw_vals[i],
+                        "mean": round(means[i], 4),
+                        "std": round(scales[i], 4),
+                        "result": round(scaled_vals[i], 4)
+                    })
+
+        # --- BƯỚC 3: DỰ ĐOÁN (PREDICTION) ---
         model_results = {}
         probs = []
         
@@ -259,12 +413,13 @@ def index():
                 try:
                     raw_prob = model.predict_proba(input_scaled)[0][1] * 100
                     final_prob = raw_prob
-                    # Logic Boosting (Giữ nguyên)
+                    # Logic Boosting
                     if final_total >= 27: final_prob = max(raw_prob, 98.0 + np.random.uniform(0, 1.9))
                     elif final_total >= 24: final_prob = max(raw_prob, 90.0 + np.random.uniform(0, 5))
                     elif final_total >= 21: final_prob = max(raw_prob, 75.0 + np.random.uniform(0, 10))
                     elif final_total >= 18: final_prob = max(raw_prob, 55.0)
                     if percentile > 90: final_prob = max(final_prob, 92.0)
+                    
                     label = "Đỗ" if final_prob >= 50 else "Trượt"
                     model_results[m_name] = (label, final_prob)
                     probs.append(final_prob)
@@ -276,7 +431,7 @@ def index():
             elif avg_prob >= 40: final_message = f"CÂN NHẮC ({avg_prob:.1f}%)"; result_css = "warning"
             else: final_message = f"NGUY HIỂM ({avg_prob:.1f}%)"; result_css = "danger"
 
-        # Vẽ biểu đồ Phổ điểm (Giữ nguyên)
+        # Vẽ biểu đồ Phổ điểm
         plot_url = None
         if not is_liet and len(current_dist) > 0:
             fig, ax = plt.subplots(figsize=(8, 4))
@@ -290,15 +445,15 @@ def index():
             img = io.BytesIO(); fig.savefig(img, format='png', bbox_inches='tight'); img.seek(0)
             plot_url = base64.b64encode(img.getvalue()).decode(); plt.close(fig)
 
-        # --- GỌI HÀM VẼ 4 BIỂU ĐỒ ---
-        # Truyền model_results vào để vẽ biểu đồ Cột và Tròn
         algo_plots = generate_model_insights(model_results)
 
         trace = {
             "raw_total": round(raw_total, 2), "priority": priority, "final_total": round(final_total, 2),
             "percentile": round(percentile, 1), "is_liet": is_liet, "message": final_message,
             "result_css": result_css, "plot_url": plot_url, "model_results": model_results,
-            "algo_plots": algo_plots
+            "algo_plots": algo_plots,
+            "pipeline_specs": pipeline_specs, # [QUAN TRỌNG] Gửi dữ liệu chi tiết
+            "block_name": bname 
         }
 
     return render_template("index.html", input_data=input_data, trace=trace)

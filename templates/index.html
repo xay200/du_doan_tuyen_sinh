@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Dự Đoán Tuyển Sinh | Báo Cáo Học Máy</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -19,7 +20,7 @@
             gap: 25px;
             margin-top: 25px;
         }
-        
+
         .algo-card {
             background: white;
             border: 1px solid #e2e8f0;
@@ -31,7 +32,7 @@
             flex-direction: column;
             align-items: center;
         }
-        
+
         .algo-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -60,23 +61,26 @@
         .timeline-item {
             display: flex;
             gap: 25px;
-            margin-bottom: 0; /* Loại bỏ margin bottom để line nối liền mạch */
+            margin-bottom: 0;
+            /* Loại bỏ margin bottom để line nối liền mạch */
             position: relative;
-            padding-bottom: 35px; /* Tạo khoảng cách bằng padding */
+            padding-bottom: 35px;
+            /* Tạo khoảng cách bằng padding */
         }
 
         /* Đường kẻ nối dọc */
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: 24px; /* Căn giữa icon (50px / 2 - 1px) */
+            left: 24px;
+            /* Căn giữa icon (50px / 2 - 1px) */
             top: 50px;
             bottom: 0;
             width: 2px;
             background: #cbd5e1;
             z-index: 0;
         }
-        
+
         /* Ẩn đường kẻ ở item cuối cùng */
         .timeline-item:last-child::before,
         .timeline-item:last-child {
@@ -90,14 +94,18 @@
         }
 
         .timeline-icon {
-            width: 50px; height: 50px;
+            width: 50px;
+            height: 50px;
             background: white;
             border: 2px solid var(--primary);
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: var(--primary);
             font-size: 1.2rem;
-            box-shadow: 0 0 0 4px #f8fafc; /* Viền trắng bao quanh để tách đường kẻ */
+            box-shadow: 0 0 0 4px #f8fafc;
+            /* Viền trắng bao quanh để tách đường kẻ */
             transition: all 0.3s;
         }
 
@@ -122,8 +130,10 @@
         .timeline-content::after {
             content: '';
             position: absolute;
-            top: 20px; left: -6px;
-            width: 12px; height: 12px;
+            top: 20px;
+            left: -6px;
+            width: 12px;
+            height: 12px;
             background: white;
             border-left: 1px solid #e2e8f0;
             border-bottom: 1px solid #e2e8f0;
@@ -157,13 +167,132 @@
             color: #64748b;
             line-height: 1.5;
         }
+
+        /* CSS CHO GIAO DIỆN PIPELINE */
+        .pipeline-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .pipeline-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .pipeline-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-badge {
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-title-text {
+            font-weight: 700;
+            color: #334155;
+            font-size: 1.05rem;
+        }
+
+        .pipeline-body {
+            padding: 25px;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            color: #64748b;
+            font-weight: 600;
+            padding: 12px;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badges & Text highlights */
+        .badge-gray {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .math-font {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #6366f1;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pass {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .info-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 15px;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="loader-overlay" id="loader">
         <div class="spinner"></div>
-        <p style="margin-top: 20px; font-weight: 600; color: var(--primary); font-size: 1.1rem;">Hệ thống đang xử lý dữ liệu...</p>
+        <p style="margin-top: 20px; font-weight: 600; color: var(--primary); font-size: 1.1rem;">Hệ thống đang xử lý dữ
+            liệu...</p>
     </div>
 
     <div class="container">
@@ -176,51 +305,81 @@
 
         <div class="card">
             <form method="POST" id="predictForm" onsubmit="return validateAndSubmit()">
-                
+
                 <h3><i class="fa-solid fa-address-card"></i> Thông tin hồ sơ</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Họ và Tên thí sinh</label>
-                        <input type="text" name="name" value="{{ input_data.name if input_data else '' }}" required placeholder="Ví dụ: Nguyễn Văn A">
+                        <input type="text" name="name" value="{{ input_data.name if input_data else '' }}" required
+                            placeholder="Ví dụ: Nguyễn Văn A">
                     </div>
                     <div class="form-group">
                         <label>Khu vực ưu tiên</label>
                         <select name="region">
-                            <option value="KV3" {% if input_data and input_data.region == 'KV3' %}selected{% endif %}>KV3 (Không cộng điểm)</option>
-                            <option value="KV2" {% if input_data and input_data.region == 'KV2' %}selected{% endif %}>KV2 (+0.25 điểm)</option>
-                            <option value="KV2-NT" {% if input_data and input_data.region == 'KV2-NT' %}selected{% endif %}>KV2-NT (+0.5 điểm)</option>
-                            <option value="KV1" {% if input_data and input_data.region == 'KV1' %}selected{% endif %}>KV1 (+0.75 điểm)</option>
+                            <option value="KV3" {% if input_data and input_data.region=='KV3' %}selected{% endif %}>KV3
+                                (Không cộng điểm)</option>
+                            <option value="KV2" {% if input_data and input_data.region=='KV2' %}selected{% endif %}>KV2
+                                (+0.25 điểm)</option>
+                            <option value="KV2-NT" {% if input_data and input_data.region=='KV2-NT' %}selected{% endif
+                                %}>KV2-NT (+0.5 điểm)</option>
+                            <option value="KV1" {% if input_data and input_data.region=='KV1' %}selected{% endif %}>KV1
+                                (+0.75 điểm)</option>
                         </select>
                     </div>
                 </div>
 
                 <h3><i class="fa-solid fa-cubes"></i> Khối xét tuyển</h3>
                 <div class="form-group">
-                    <select name="block_name" id="blockSelect" onchange="updateSubjects()" style="font-weight: 600; color: var(--primary);">
-                        <option value="A00" {% if input_data and input_data.block_name == 'A00' %}selected{% endif %}>Khối A00 (Toán, Lý, Hóa)</option>
-                        <option value="A01" {% if input_data and input_data.block_name == 'A01' %}selected{% endif %}>Khối A01 (Toán, Lý, Anh)</option>
-                        <option value="B00" {% if input_data and input_data.block_name == 'B00' %}selected{% endif %}>Khối B00 (Toán, Hóa, Sinh)</option>
-                        <option value="C00" {% if input_data and input_data.block_name == 'C00' %}selected{% endif %}>Khối C00 (Văn, Sử, Địa)</option>
-                        <option value="D01" {% if input_data and input_data.block_name == 'D01' %}selected{% endif %}>Khối D01 (Toán, Văn, Anh)</option>
+                    <select name="block_name" id="blockSelect" onchange="updateSubjects()"
+                        style="font-weight: 600; color: var(--primary);">
+                        <option value="A00" {% if input_data and input_data.block_name=='A00' %}selected{% endif %}>Khối
+                            A00 (Toán, Lý, Hóa)</option>
+                        <option value="A01" {% if input_data and input_data.block_name=='A01' %}selected{% endif %}>Khối
+                            A01 (Toán, Lý, Anh)</option>
+                        <option value="B00" {% if input_data and input_data.block_name=='B00' %}selected{% endif %}>Khối
+                            B00 (Toán, Hóa, Sinh)</option>
+                        <option value="C00" {% if input_data and input_data.block_name=='C00' %}selected{% endif %}>Khối
+                            C00 (Văn, Sử, Địa)</option>
+                        <option value="D01" {% if input_data and input_data.block_name=='D01' %}selected{% endif %}>Khối
+                            D01 (Toán, Văn, Anh)</option>
                     </select>
                 </div>
 
                 <h3><i class="fa-solid fa-pen-to-square"></i> Nhập điểm thi (Thang điểm 10)</h3>
                 <div class="score-grid">
-                    <div class="score-item" id="wrap_math"><label>Toán</label><input type="number" step="0.01" min="0" max="10" name="math" id="math" value="{{ input_data.math if input_data else '' }}" placeholder="0-10" required></div>
-                    <div class="score-item" id="wrap_literature"><label>Ngữ Văn</label><input type="number" step="0.01" min="0" max="10" name="literature" id="literature" value="{{ input_data.literature if input_data else '' }}" placeholder="0-10" required></div>
-                    <div class="score-item" id="wrap_english"><label>Tiếng Anh</label><input type="number" step="0.01" min="0" max="10" name="english" id="english" value="{{ input_data.english if input_data else '' }}" placeholder="0-10" required></div>
-                    
-                    <div class="score-item hidden" id="wrap_physics"><label>Vật Lý</label><input type="number" step="0.01" min="0" max="10" name="physics" id="physics" value="{{ input_data.physics if input_data else '' }}" placeholder="0-10"></div>
-                    <div class="score-item hidden" id="wrap_chemistry"><label>Hóa Học</label><input type="number" step="0.01" min="0" max="10" name="chemistry" id="chemistry" value="{{ input_data.chemistry if input_data else '' }}" placeholder="0-10"></div>
-                    <div class="score-item hidden" id="wrap_biology"><label>Sinh Học</label><input type="number" step="0.01" min="0" max="10" name="biology" id="biology" value="{{ input_data.biology if input_data else '' }}" placeholder="0-10"></div>
-                    <div class="score-item hidden" id="wrap_history"><label>Lịch Sử</label><input type="number" step="0.01" min="0" max="10" name="history" id="history" value="{{ input_data.history if input_data else '' }}" placeholder="0-10"></div>
-                    <div class="score-item hidden" id="wrap_geography"><label>Địa Lý</label><input type="number" step="0.01" min="0" max="10" name="geography" id="geography" value="{{ input_data.geography if input_data else '' }}" placeholder="0-10"></div>
-                    <div class="score-item hidden" id="wrap_gdcd"><label>GDCD</label><input type="number" step="0.01" min="0" max="10" name="gdcd" id="gdcd" value="{{ input_data.gdcd if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item" id="wrap_math"><label>Toán</label><input type="number" step="0.01" min="0"
+                            max="10" name="math" id="math" value="{{ input_data.math if input_data else '' }}"
+                            placeholder="0-10" required></div>
+                    <div class="score-item" id="wrap_literature"><label>Ngữ Văn</label><input type="number" step="0.01"
+                            min="0" max="10" name="literature" id="literature"
+                            value="{{ input_data.literature if input_data else '' }}" placeholder="0-10" required></div>
+                    <div class="score-item" id="wrap_english"><label>Tiếng Anh</label><input type="number" step="0.01"
+                            min="0" max="10" name="english" id="english"
+                            value="{{ input_data.english if input_data else '' }}" placeholder="0-10" required></div>
+
+                    <div class="score-item hidden" id="wrap_physics"><label>Vật Lý</label><input type="number"
+                            step="0.01" min="0" max="10" name="physics" id="physics"
+                            value="{{ input_data.physics if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_chemistry"><label>Hóa Học</label><input type="number"
+                            step="0.01" min="0" max="10" name="chemistry" id="chemistry"
+                            value="{{ input_data.chemistry if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_biology"><label>Sinh Học</label><input type="number"
+                            step="0.01" min="0" max="10" name="biology" id="biology"
+                            value="{{ input_data.biology if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_history"><label>Lịch Sử</label><input type="number"
+                            step="0.01" min="0" max="10" name="history" id="history"
+                            value="{{ input_data.history if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_geography"><label>Địa Lý</label><input type="number"
+                            step="0.01" min="0" max="10" name="geography" id="geography"
+                            value="{{ input_data.geography if input_data else '' }}" placeholder="0-10"></div>
+                    <div class="score-item hidden" id="wrap_gdcd"><label>GDCD</label><input type="number" step="0.01"
+                            min="0" max="10" name="gdcd" id="gdcd" value="{{ input_data.gdcd if input_data else '' }}"
+                            placeholder="0-10"></div>
                 </div>
 
                 <div style="display: flex; gap: 15px; margin-top: 30px;">
-                    <a href="/" class="btn-reset" type="button" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 30%; background: #f1f5f9; color: var(--text-sub); border-radius: 12px; font-weight: 600;">
+                    <a href="/" class="btn-reset" type="button"
+                        style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 30%; background: #f1f5f9; color: var(--text-sub); border-radius: 12px; font-weight: 600;">
                         <i class="fa-solid fa-rotate-right" style="margin-right: 8px;"></i> Làm mới
                     </a>
                     <button type="submit" class="btn-submit" style="width: 70%;">
@@ -232,9 +391,11 @@
 
         {% if trace %}
         <div class="result-box" id="resultSection">
-            
+
             <div class="result-header">
-                <p style="text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 10px;">Đánh giá tổng quát</p>
+                <p
+                    style="text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 10px;">
+                    Đánh giá tổng quát</p>
                 <div class="final-verdict {{ trace.result_css }}">
                     {% if trace.result_css == 'success' %}<i class="fa-solid fa-check-circle"></i>
                     {% elif trace.result_css == 'warning' %}<i class="fa-solid fa-triangle-exclamation"></i>
@@ -245,22 +406,26 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: #e0e7ff; color: var(--primary);"><i class="fa-solid fa-star"></i></div>
+                    <div class="stat-icon" style="background: #e0e7ff; color: var(--primary);"><i
+                            class="fa-solid fa-star"></i></div>
                     <div class="stat-value">{{ trace.final_total }}</div>
                     <div class="stat-label">Tổng điểm xét tuyển</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: #dcfce7; color: #166534;"><i class="fa-solid fa-ranking-star"></i></div>
-                    
+                    <div class="stat-icon" style="background: #dcfce7; color: #166534;"><i
+                            class="fa-solid fa-ranking-star"></i></div>
+
                     <div class="stat-value">Top {{ "%.2f"|format(100 - trace.percentile) }}%</div>
-                    
+
                     <div class="stat-label">Xếp hạng toàn quốc</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: {{ '#fee2e2' if trace.is_liet else '#d1fae5' }}; color: {{ '#991b1b' if trace.is_liet else '#065f46' }};">
+                    <div class="stat-icon"
+                        style="background: {{ '#fee2e2' if trace.is_liet else '#d1fae5' }}; color: {{ '#991b1b' if trace.is_liet else '#065f46' }};">
                         <i class="fa-solid {{ 'fa-ban' if trace.is_liet else 'fa-check' }}"></i>
                     </div>
-                    <div class="stat-value" style="font-size: 1.4rem; color: {{ '#ef4444' if trace.is_liet else '#10b981' }}">
+                    <div class="stat-value"
+                        style="font-size: 1.4rem; color: {{ '#ef4444' if trace.is_liet else '#10b981' }}">
                         {{ "Vi phạm" if trace.is_liet else "Đạt chuẩn" }}
                     </div>
                     <div class="stat-label">Điều kiện điểm liệt</div>
@@ -268,16 +433,19 @@
             </div>
 
             <div style="margin-top: 40px; padding-top: 30px; border-top: 1px dashed var(--border);">
-                <h4 style="color: var(--text-main); margin-bottom: 25px; font-weight: 800; text-align: center; font-size: 1.2rem;">
-                    <i class="fa-solid fa-chart-pie" style="color: #ec4899; margin-right: 8px;"></i> PHÂN TÍCH & TRỰC QUAN HÓA
+                <h4
+                    style="color: var(--text-main); margin-bottom: 25px; font-weight: 800; text-align: center; font-size: 1.2rem;">
+                    <i class="fa-solid fa-chart-pie" style="color: #ec4899; margin-right: 8px;"></i> PHÂN TÍCH & TRỰC
+                    QUAN HÓA
                 </h4>
 
                 <div class="charts-wrapper">
-                    
+
                     {% if trace.algo_plots.comparison_bar %}
                     <div class="algo-card">
                         <div class="algo-title"><i class="fa-solid fa-chart-column"></i> So sánh các Mô hình</div>
-                        <img src="data:image/png;base64,{{ trace.algo_plots.comparison_bar }}" style="width: 100%; border-radius: 8px;">
+                        <img src="data:image/png;base64,{{ trace.algo_plots.comparison_bar }}"
+                            style="width: 100%; border-radius: 8px;">
                     </div>
                     {% endif %}
 
@@ -285,7 +453,8 @@
                     <div class="algo-card">
                         <div class="algo-title"><i class="fa-solid fa-chart-pie"></i> Tổng quan Hệ thống</div>
                         <div style="display:flex; justify-content:center; align-items:center; height: 100%;">
-                            <img src="data:image/png;base64,{{ trace.algo_plots.consensus_pie }}" style="max-height: 250px; border-radius: 8px;">
+                            <img src="data:image/png;base64,{{ trace.algo_plots.consensus_pie }}"
+                                style="max-height: 250px; border-radius: 8px;">
                         </div>
                     </div>
                     {% endif %}
@@ -302,7 +471,8 @@
                     <div class="algo-card" style="grid-column: 1 / -1;">
                         <div class="algo-title"><i class="fa-solid fa-tree"></i> Cây Quyết Định Minh Họa</div>
                         <div style="overflow-x: auto; width: 100%;">
-                            <img src="data:image/png;base64,{{ trace.algo_plots.dt_viz }}" style="max-height: 400px; display: block; margin: 0 auto; border-radius: 8px;">
+                            <img src="data:image/png;base64,{{ trace.algo_plots.dt_viz }}"
+                                style="max-height: 400px; display: block; margin: 0 auto; border-radius: 8px;">
                         </div>
                     </div>
                     {% endif %}
@@ -313,11 +483,13 @@
                         <img src="data:image/png;base64,{{ trace.algo_plots.rf_importance }}" style="width: 100%; border-radius: 8px;">
                     </div>
                     {% endif %} -->
-                    
+
                     {% if trace.algo_plots.lr_coefs %}
                     <div class="algo-card">
-                        <div class="algo-title"><i class="fa-solid fa-arrow-trend-up"></i> Trọng số Hồi quy (Logistic)</div>
-                        <img src="data:image/png;base64,{{ trace.algo_plots.lr_coefs }}" style="width: 100%; border-radius: 8px;">
+                        <div class="algo-title"><i class="fa-solid fa-arrow-trend-up"></i> Trọng số Hồi quy (Logistic)
+                        </div>
+                        <img src="data:image/png;base64,{{ trace.algo_plots.lr_coefs }}"
+                            style="width: 100%; border-radius: 8px;">
                     </div>
                     {% endif %}
                 </div>
@@ -329,12 +501,15 @@
                 </h4>
                 <div class="model-list">
                     {% for model, (label, prob) in trace.model_results.items() %}
-                    <div class="model-item" style="border-top: 4px solid {{ '#10b981' if prob >= 50 else '#ef4444' }}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <div class="model-item"
+                        style="border-top: 4px solid {{ '#10b981' if prob >= 50 else '#ef4444' }}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                         <span class="model-name" style="font-weight: 600;">{{ model }}</span>
-                        <span class="model-prob" style="color: {{ '#10b981' if prob >= 50 else '#ef4444' }}; font-size: 1.3rem;">
+                        <span class="model-prob"
+                            style="color: {{ '#10b981' if prob >= 50 else '#ef4444' }}; font-size: 1.3rem;">
                             {{ "%.2f"|format(prob) }}%
                         </span>
-                        <span style="font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">
+                        <span
+                            style="font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">
                             {{ label }}
                         </span>
                     </div>
@@ -342,109 +517,175 @@
                 </div>
             </div>
 
-            <div style="margin-top: 50px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 40px 30px;">
-                <h4 style="color: var(--text-main); margin-bottom: 40px; font-weight: 800; text-align: center; font-size: 1.3rem;">
-                    <i class="fa-solid fa-gears" style="color: #f59e0b; margin-right: 10px;"></i> QUY TRÌNH XỬ LÝ DỮ LIỆU (PIPELINE)
-                </h4>
-                
-                <div class="timeline-section">
-                    <div class="timeline-item">
-                        <div class="timeline-icon-box">
-                            <div class="timeline-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
-                        </div>
-                        <div class="timeline-content">
-                            <span class="timeline-step-num">Bước 1</span>
-                            <div class="timeline-title">Thu thập & Tiền xử lý</div>
-                            <div class="timeline-desc">
-                                Hệ thống tiếp nhận điểm số từ Form nhập liệu. Tự động kiểm tra giá trị hợp lệ (0-10) và điền 0 cho các môn vắng thi (Missing Imputation).
-                            </div>
-                        </div>
-                    </div>
+            <div
+                style="margin-top: 50px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 40px 30px;">
 
-                    <div class="timeline-item">
-                        <div class="timeline-icon-box">
-                            <div class="timeline-icon"><i class="fa-solid fa-calculator"></i></div>
-                        </div>
-                        <div class="timeline-content">
-                            <span class="timeline-step-num">Bước 2</span>
-                            <div class="timeline-title">Feature Engineering (Tạo đặc trưng)</div>
-                            <div class="timeline-desc">
-                                Tính tổng điểm theo khối thi đã chọn ({{ input_data.block_name }}). Cộng điểm ưu tiên khu vực ({{ input_data.region }}). Kiểm tra điều kiện điểm liệt (< 1.0).
-                            </div>
-                        </div>
-                    </div>
+                <div style="margin-top: 60px; padding-top: 40px; border-top: 2px dashed #e2e8f0;">
+                    <h4
+                        style="color: var(--text-main); margin-bottom: 30px; font-weight: 800; text-align: center; font-size: 1.4rem;">
+                        <i class="fa-solid fa-gears" style="color: #f59e0b;"></i> QUY TRÌNH XỬ LÝ DỮ LIỆU CHI TIẾT
+                    </h4>
 
-                    <div class="timeline-item">
-                        <div class="timeline-icon-box">
-                            <div class="timeline-icon"><i class="fa-solid fa-ruler-combined"></i></div>
-                        </div>
-                        <div class="timeline-content">
-                            <span class="timeline-step-num">Bước 3</span>
-                            <div class="timeline-title">Chuẩn hóa dữ liệu (Scaling)</div>
-                            <div class="timeline-desc">
-                                Dữ liệu đầu vào được đưa về cùng thang đo bằng <code>StandardScaler</code> (Mean=0, Std=1) để đảm bảo độ chính xác cho SVM và KNN.
-                            </div>
-                        </div>
-                    </div>
+                    <div class="pipeline-wrapper">
 
-                    <div class="timeline-item">
-                        <div class="timeline-icon-box">
-                            <div class="timeline-icon"><i class="fa-solid fa-network-wired"></i></div>
-                        </div>
-                        <div class="timeline-content">
-                            <span class="timeline-step-num">Bước 4</span>
-                            <div class="timeline-title">Ensemble Learning (Học máy tổ hợp)</div>
-                            <div class="timeline-desc">
-                                4 Mô hình (Logistic, Random Forest, SVM, KNN) chạy song song. Sử dụng kỹ thuật <code>Probability Calibration</code> để chuyển đổi đầu ra thành xác suất chuẩn xác.
+                        <div class="pipeline-card">
+                            <div class="pipeline-header">
+                                <span class="step-badge">Bước 1</span>
+                                <span class="step-title-text">Dữ liệu thô & Tạo đặc trưng (Feature Engineering)</span>
+                            </div>
+                            <div class="pipeline-body">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <table class="data-table">
+                                            <tr>
+                                                <th width="40%">Thuộc tính</th>
+                                                <th>Giá trị nhập từ Form</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Họ tên thí sinh</td>
+                                                <td><strong>{{ input_data.name }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Khu vực ưu tiên</td>
+                                                <td><span class="badge-gray">{{ input_data.region }}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Khối xét tuyển</td>
+                                                <td><span class="badge-gray">{{ trace.block_name }}</span></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="info-box">
+                                            <strong style="color: #c2410c; display: block; margin-bottom: 10px;">
+                                                <i class="fa-solid fa-calculator"></i> Logic tính điểm:
+                                            </strong>
+                                            <ul
+                                                style="margin: 0; padding-left: 20px; font-size: 0.95rem; line-height: 1.8; color: #7c2d12;">
+                                                <li>Tổng điểm 3 môn khối {{ trace.block_name }}: <strong>{{
+                                                        trace.raw_total }}</strong></li>
+                                                <li>Điểm cộng vùng {{ input_data.region }}: <strong>+{{ trace.priority
+                                                        }}</strong></li>
+                                                <li
+                                                    style="border-top: 1px dashed #fdba74; margin-top: 5px; padding-top: 5px;">
+                                                    Tổng điểm xét tuyển: <strong style="font-size: 1.2rem;">{{
+                                                        trace.final_total }}</strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="timeline-item">
-                        <div class="timeline-icon-box">
-                            <div class="timeline-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
-                        </div>
-                        <div class="timeline-content">
-                            <span class="timeline-step-num">Bước 5</span>
-                            <div class="timeline-title">Phân tích Thống kê & Ra quyết định</div>
-                            <div class="timeline-desc">
-                                So sánh điểm với phổ điểm toàn quốc 2019 (Percentile Ranking). Kết hợp kết quả AI với Luật chuyên gia (Expert Rules) để đưa ra kết luận cuối cùng.
+                        <div class="pipeline-card">
+                            <div class="pipeline-header">
+                                <span class="step-badge">Bước 2</span>
+                                <span class="step-title-text">Chuẩn hóa dữ liệu (StandardScaler)</span>
+                            </div>
+                            <div class="pipeline-body">
+                                <p style="color: #64748b; margin-bottom: 20px; font-size: 0.95rem;">
+                                    Để đảm bảo thuật toán (đặc biệt là KNN và SVM) hoạt động chính xác, dữ liệu được
+                                    chuyển về dạng phân phối chuẩn.
+                                    <br>
+                                    <strong>Công thức:</strong> <span class="math-font">z = (x - mean) / std</span>
+                                </p>
+                                <div style="overflow-x: auto;">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Đặc trưng (Feature)</th>
+                                                <th>Điểm gốc (x)</th>
+                                                <th>Trung bình (mean)</th>
+                                                <th>Độ lệch (std)</th>
+                                                <th>Kết quả (z)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in trace.pipeline_specs %}
+                                            <tr>
+                                                <td><span class="badge-gray">{{ item.feature }}</span></td>
+                                                <td style="font-weight: bold;">{{ item.raw }}</td>
+                                                <td class="math-font" style="color: #64748b;">{{ item.mean }}</td>
+                                                <td class="math-font" style="color: #64748b;">{{ item.std }}</td>
+                                                <td class="math-font">{{ item.result }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="pipeline-card">
+                            <div class="pipeline-header">
+                                <span class="step-badge">Bước 3</span>
+                                <span class="step-title-text">Dự đoán từ Mô hình & Ngưỡng quyết định</span>
+                            </div>
+                            <div class="pipeline-body">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mô hình</th>
+                                            <th>Xác suất (Probability)</th>
+                                            <th>Ngưỡng (Threshold)</th>
+                                            <th>Kết luận</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for model, (label, prob) in trace.model_results.items() %}
+                                        <tr>
+                                            <td><strong>{{ model }}</strong></td>
+                                            <td class="math-font" style="font-size: 1.1rem;">{{ "%.4f"|format(prob/100)
+                                                }}</td>
+                                            <td style="color: #64748b;">> 0.5</td>
+                                            <td>
+                                                {% if prob >= 50 %}
+                                                <span class="status-badge status-pass">Đỗ</span>
+                                                {% else %}
+                                                <span class="status-badge status-fail">Trượt</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
-
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        function validateAndSubmit() {
-            const inputs = document.querySelectorAll('input[type="number"]');
-            for (let input of inputs) {
-                if (input.value && (input.value < 0 || input.value > 10)) {
-                    alert("Điểm thi phải nằm trong khoảng từ 0 đến 10!");
-                    input.focus();
-                    return false;
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script>
+            function validateAndSubmit() {
+                const inputs = document.querySelectorAll('input[type="number"]');
+                for (let input of inputs) {
+                    if (input.value && (input.value < 0 || input.value > 10)) {
+                        alert("Điểm thi phải nằm trong khoảng từ 0 đến 10!");
+                        input.focus();
+                        return false;
+                    }
                 }
+                showLoader();
+                return true;
             }
-            showLoader();
-            return true;
-        }
 
-        {% if trace %}
-            window.onload = function() {
+            {% if trace %}
+            window.onload = function () {
                 const resultDiv = document.getElementById("resultSection");
-                if(resultDiv) {
+                if (resultDiv) {
                     const y = resultDiv.getBoundingClientRect().top + window.scrollY - 20;
-                    window.scrollTo({top: y, behavior: 'smooth'});
+                    window.scrollTo({ top: y, behavior: 'smooth' });
                 }
             };
-        {% endif %}
-        
-        document.addEventListener("DOMContentLoaded", function() { updateSubjects(); });
-    </script>
+            {% endif %}
+
+            document.addEventListener("DOMContentLoaded", function () { updateSubjects(); });
+        </script>
 </body>
+
 </html>
